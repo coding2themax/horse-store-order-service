@@ -1,4 +1,4 @@
-package com.coding2.the.max.petstore.order.model;
+package com.coding2.the.max.horse.order.model;
 
 public enum OrderStatus {
   PLACED,
