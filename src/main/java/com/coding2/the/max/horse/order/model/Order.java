@@ -1,11 +1,11 @@
 package com.coding2.the.max.horse.order.model;
 
-import org.openapitools.client.model.Address;
+import java.math.BigDecimal; // Add this import statement
+
+import org.springframework.boot.autoconfigure.amqp.RabbitConnectionDetails.Address;
 
 import lombok.Getter;
 import lombok.Setter;
-
-import java.math.BigDecimal; // Add this import statement
 
 @Getter
 @Setter
