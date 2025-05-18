@@ -1,16 +1,16 @@
 package com.coding2.the.max.horse.order.repo;
 
-import com.coding2.the.max.horse.order.model.PetOrder;
+import com.coding2.the.max.horse.order.model.HorseStoreOrder;
 
 /**
  * Interface for notification service
  */
 public interface NotificationService {
-  void sendOrderCreationNotification(PetOrder order);
+  void sendOrderCreationNotification(HorseStoreOrder order);
 
-  void sendOrderStatusUpdateNotification(PetOrder order);
+  void sendOrderStatusUpdateNotification(HorseStoreOrder order);
 
-  void sendPaymentConfirmationNotification(PetOrder order);
+  void sendPaymentConfirmationNotification(HorseStoreOrder order);
 
-  void sendOrderCancellationNotification(PetOrder order);
+  void sendOrderCancellationNotification(HorseStoreOrder order);
 }

@@ -3,18 +3,18 @@ package com.coding2.the.max.horse.order.repo;
 import java.util.List;
 import java.util.Optional;
 
+import com.coding2.the.max.horse.order.model.HorseStoreOrder;
 import com.coding2.the.max.horse.order.model.OrderStatus;
-import com.coding2.the.max.horse.order.model.PetOrder;
 
 /**
  * Repository interface for pet orders
  */
 public interface OrderRepository {
-  void save(PetOrder order);
+  void save(HorseStoreOrder order);
 
-  Optional<PetOrder> findById(String orderId);
+  Optional<HorseStoreOrder> findById(String orderId);
 
-  List<PetOrder> findByCustomerId(String customerId);
+  List<HorseStoreOrder> findByCustomerId(String customerId);
 
-  List<PetOrder> findByStatus(OrderStatus status);
+  List<HorseStoreOrder> findByStatus(OrderStatus status);
 }

@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: petstore-order-service-test
+  r2dbc:
+    url: r2dbc:tc:postgresql:///testdb?TC_IMAGE_TAG=14-alpine
+    username: test
+    password: test
+    pool:
+      initial-size: 1
+      max-size: 5
+
+  sql:
+    init:
+      mode: always
+
+logging:
+  level:
+    "[org.springframework.r2dbc]": DEBUG
+    "[io.r2dbc.postgresql]": DEBUG
+    "[org.testcontainers]": INFO
+    root: INFO
+
+# Testcontainers configuration
+testcontainers:
+  reuse:
+    enable: true

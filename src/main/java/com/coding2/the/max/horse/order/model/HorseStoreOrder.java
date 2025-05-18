@@ -13,7 +13,7 @@ import lombok.Setter;
 @Builder
 @Getter
 @Setter
-public class PetOrder {
+public class HorseStoreOrder {
   private String orderId;
   private String customerId;
   private Date orderDate;

@@ -1,6 +1,6 @@
 package com.coding2.the.max.horse.order.repo;
 
-import com.coding2.the.max.horse.order.model.PetOrder;
+import com.coding2.the.max.horse.order.model.HorseStoreOrder;
 
 /**
  * Interface for inventory management service
@@ -8,7 +8,7 @@ import com.coding2.the.max.horse.order.model.PetOrder;
 public interface InventoryService {
   boolean isAvailable(String petId, int quantity);
 
-  void reserveInventory(PetOrder order);
+  void reserveInventory(HorseStoreOrder order);
 
-  void returnInventoryForOrder(PetOrder order);
+  void returnInventoryForOrder(HorseStoreOrder order);
 }

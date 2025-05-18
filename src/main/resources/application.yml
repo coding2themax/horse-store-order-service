@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: petstore-order-service
+  r2dbc:
+    url: ${DATABASE_HOST:localhost}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+    pool:
+      initial-size: 5
+      max-size: 20
+
+  sql:
+    init:
+      mode: always
+
+logging:
+  level:
+    "[org.springframework.r2dbc]": DEBUG
+    "[io.r2dbc.postgresql]": DEBUG

@@ -1,13 +1,15 @@
 package com.coding2.the.max.horse.order.model;
 
-import java.math.BigDecimal; // Add this import statement
+import java.math.BigDecimal;
 
+import org.springframework.data.relational.core.mapping.Table;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Table(name = "orders", schema = "horse_order")
 public class Order {
   private String id;
   private int quantity;
