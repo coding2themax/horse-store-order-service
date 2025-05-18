@@ -23,5 +23,11 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
-      - name: Test with Maven
-        run: mvn -B test --file pom.xml
+      - name: Test with Maven and generate coverage
+        run: mvn -B test jacoco:report --file pom.xml
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/
