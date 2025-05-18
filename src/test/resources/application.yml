@@ -19,8 +19,5 @@ logging:
     "[io.r2dbc.postgresql]": DEBUG
     "[org.testcontainers]": INFO
     root: INFO
-
-# Testcontainers configuration
-testcontainers:
-  reuse:
-    enable: true
+# Container reuse is configured via JVM system properties
+# -Dtestcontainers.reuse.enable=true
