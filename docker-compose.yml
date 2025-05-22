@@ -21,7 +21,7 @@ services:
     environment:
       POSTGRES_USER: ${DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      POSTGRES_DB: horse
+      POSTGRES_DB: horse-order-service
 
     volumes:
       - ./data:/var/lib/postgresql/data

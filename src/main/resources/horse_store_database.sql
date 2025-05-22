@@ -7,7 +7,7 @@ CREATE SCHEMA IF NOT EXISTS horse_order;
 COMMENT ON SCHEMA horse_order IS 'Schema for horse order related tables and functionality';
 
 -- Users table
-CREATE TABLE horse_order.users (
+CREATE TABLE IF NOT EXISTS horse_order.users (
     user_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
@@ -22,16 +22,16 @@ CREATE TABLE horse_order.users (
 );
 
 -- Categories table
-CREATE TABLE horse_order.categories (
+CREATE TABLE IF NOT EXISTS horse_order.categories (
     category_id SERIAL PRIMARY KEY,
     name VARCHAR(50) UNIQUE NOT NULL,
     description TEXT,
-    parent_id INT REFERENCES categories(category_id),
+    parent_id INT REFERENCES horse_order.categories(category_id),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Horses table (for the actual horses)
-CREATE TABLE horse_order.horses (
+CREATE TABLE IF NOT EXISTS horse_order.horses (
     horse_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(100) NOT NULL,
     breed VARCHAR(50) NOT NULL,
@@ -47,9 +47,9 @@ CREATE TABLE horse_order.horses (
 );
 
 -- Products table (for horse-related items like saddles, feed, etc.)
-CREATE TABLE horse_order.products (
+CREATE TABLE IF NOT EXISTS horse_order.products (
     product_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    category_id INT REFERENCES categories(category_id),
+    category_id INT REFERENCES horse_order.categories(category_id),
     name VARCHAR(100) NOT NULL,
     description TEXT,
     price DECIMAL(10,2) NOT NULL,
@@ -60,9 +60,9 @@ CREATE TABLE horse_order.products (
 );
 
 -- Orders table
-CREATE TABLE horse_order.orders (
+CREATE TABLE IF NOT EXISTS horse_order.orders (
     order_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID REFERENCES users(user_id),
+    user_id UUID REFERENCES horse_order.users(user_id),
     order_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     status VARCHAR(20) NOT NULL DEFAULT 'pending',
     shipping_info JSONB NOT NULL,
@@ -71,11 +71,11 @@ CREATE TABLE horse_order.orders (
 );
 
 -- Order Items table
-CREATE TABLE horse_order.order_items (
+CREATE TABLE IF NOT EXISTS horse_order.order_items (
     order_item_id SERIAL PRIMARY KEY,
-    order_id UUID REFERENCES orders(order_id),
-    product_id UUID REFERENCES products(product_id),
-    horse_id UUID REFERENCES horses(horse_id),
+    order_id UUID REFERENCES horse_order.orders(order_id),
+    product_id UUID REFERENCES horse_order.products(product_id),
+    horse_id UUID REFERENCES horse_order.horses(horse_id),
     quantity INT NOT NULL DEFAULT 1,
     unit_price DECIMAL(10,2) NOT NULL,
     CHECK (product_id IS NOT NULL OR horse_id IS NOT NULL),
@@ -83,15 +83,15 @@ CREATE TABLE horse_order.order_items (
 );
 
 -- Create appropriate indices
-CREATE INDEX idx_users_email ON horse_order.users(email);
-CREATE INDEX idx_products_category ON horse_order.products(category_id);
-CREATE INDEX idx_horses_breed ON horse_order.horses(breed);
-CREATE INDEX idx_horses_details ON horse_order.horses USING GIN (details);
-CREATE INDEX idx_products_specs ON horse_order.products USING GIN (specifications);
-CREATE INDEX idx_orders_user ON horse_order.orders(user_id);
-CREATE INDEX idx_order_items_order ON horse_order.order_items(order_id);
-CREATE INDEX idx_order_items_product ON horse_order.order_items(product_id) WHERE product_id IS NOT NULL;
-CREATE INDEX idx_order_items_horse ON horse_order.order_items(horse_id) WHERE horse_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_users_email ON horse_order.users(email);
+CREATE INDEX IF NOT EXISTS idx_products_category ON horse_order.products(category_id);
+CREATE INDEX IF NOT EXISTS idx_horses_breed ON horse_order.horses(breed);
+CREATE INDEX IF NOT EXISTS idx_horses_details ON horse_order.horses USING GIN (details);
+CREATE INDEX IF NOT EXISTS idx_products_specs ON horse_order.products USING GIN (specifications);
+CREATE INDEX IF NOT EXISTS idx_orders_user ON horse_order.orders(user_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_order ON horse_order.order_items(order_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_product ON horse_order.order_items(product_id) WHERE product_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_order_items_horse ON horse_order.order_items(horse_id) WHERE horse_id IS NOT NULL;
 
 -- Stored Procedures
 

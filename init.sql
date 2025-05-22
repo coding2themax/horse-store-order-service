@@ -1,3 +1,9 @@
+-- Create the database
+CREATE DATABASE "horse-order-service";
+
+-- Connect to the database
+\c "horse-order-service"
+
 -- Create the database schema for Horse Store
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
@@ -7,7 +13,7 @@ CREATE SCHEMA IF NOT EXISTS horse_order;
 COMMENT ON SCHEMA horse_order IS 'Schema for horse order related tables and functionality';
 
 -- Users table
-CREATE TABLE horse_order.users (
+CREATE TABLE IF NOT EXISTS horse_order.users (
     user_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
@@ -22,16 +28,16 @@ CREATE TABLE horse_order.users (
 );
 
 -- Categories table
-CREATE TABLE horse_order.categories (
+CREATE TABLE IF NOT EXISTS horse_order.categories (
     category_id SERIAL PRIMARY KEY,
     name VARCHAR(50) UNIQUE NOT NULL,
     description TEXT,
-    parent_id INT REFERENCES categories(category_id),
+    parent_id INT REFERENCES horse_order.categories(category_id),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Horses table (for the actual horses)
-CREATE TABLE horse_order.horses (
+CREATE TABLE IF NOT EXISTS horse_order.horses (
     horse_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(100) NOT NULL,
     breed VARCHAR(50) NOT NULL,
@@ -47,9 +53,9 @@ CREATE TABLE horse_order.horses (
 );
 
 -- Products table (for horse-related items like saddles, feed, etc.)
-CREATE TABLE horse_order.products (
+CREATE TABLE IF NOT EXISTS horse_order.products (
     product_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    category_id INT REFERENCES categories(category_id),
+    category_id INT REFERENCES horse_order.categories(category_id),
     name VARCHAR(100) NOT NULL,
     description TEXT,
     price DECIMAL(10,2) NOT NULL,
@@ -60,9 +66,9 @@ CREATE TABLE horse_order.products (
 );
 
 -- Orders table
-CREATE TABLE horse_order.orders (
+CREATE TABLE IF NOT EXISTS horse_order.orders (
     order_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID REFERENCES users(user_id),
+    user_id UUID REFERENCES horse_order.users(user_id),
     order_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     status VARCHAR(20) NOT NULL DEFAULT 'pending',
     shipping_info JSONB NOT NULL,
@@ -71,11 +77,11 @@ CREATE TABLE horse_order.orders (
 );
 
 -- Order Items table
-CREATE TABLE horse_order.order_items (
+CREATE TABLE IF NOT EXISTS horse_order.order_items (
     order_item_id SERIAL PRIMARY KEY,
-    order_id UUID REFERENCES orders(order_id),
-    product_id UUID REFERENCES products(product_id),
-    horse_id UUID REFERENCES horses(horse_id),
+    order_id UUID REFERENCES horse_order.orders(order_id),
+    product_id UUID REFERENCES horse_order.products(product_id),
+    horse_id UUID REFERENCES horse_order.horses(horse_id),
     quantity INT NOT NULL DEFAULT 1,
     unit_price DECIMAL(10,2) NOT NULL,
     CHECK (product_id IS NOT NULL OR horse_id IS NOT NULL),
@@ -83,15 +89,15 @@ CREATE TABLE horse_order.order_items (
 );
 
 -- Create appropriate indices
-CREATE INDEX idx_users_email ON horse_order.users(email);
-CREATE INDEX idx_products_category ON horse_order.products(category_id);
-CREATE INDEX idx_horses_breed ON horse_order.horses(breed);
-CREATE INDEX idx_horses_details ON horse_order.horses USING GIN (details);
-CREATE INDEX idx_products_specs ON horse_order.products USING GIN (specifications);
-CREATE INDEX idx_orders_user ON horse_order.orders(user_id);
-CREATE INDEX idx_order_items_order ON horse_order.order_items(order_id);
-CREATE INDEX idx_order_items_product ON horse_order.order_items(product_id) WHERE product_id IS NOT NULL;
-CREATE INDEX idx_order_items_horse ON horse_order.order_items(horse_id) WHERE horse_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_users_email ON horse_order.users(email);
+CREATE INDEX IF NOT EXISTS idx_products_category ON horse_order.products(category_id);
+CREATE INDEX IF NOT EXISTS idx_horses_breed ON horse_order.horses(breed);
+CREATE INDEX IF NOT EXISTS idx_horses_details ON horse_order.horses USING GIN (details);
+CREATE INDEX IF NOT EXISTS idx_products_specs ON horse_order.products USING GIN (specifications);
+CREATE INDEX IF NOT EXISTS idx_orders_user ON horse_order.orders(user_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_order ON horse_order.order_items(order_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_product ON horse_order.order_items(product_id) WHERE product_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_order_items_horse ON horse_order.order_items(horse_id) WHERE horse_id IS NOT NULL;
 
 -- Stored Procedures
 
@@ -198,3 +204,46 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Insert test data for integration testing
+
+-- Insert test users
+INSERT INTO horse_order.users (user_id, username, email, password_hash, first_name, last_name, address, phone)
+VALUES
+    ('11111111-1111-1111-1111-111111111111', 'testuser1', 'test1@example.com', 'hash1', 'John', 'Doe', '123 Test St', '555-0001'),
+    ('22222222-2222-2222-2222-222222222222', 'testuser2', 'test2@example.com', 'hash2', 'Jane', 'Smith', '456 Test Ave', '555-0002');
+
+-- Insert test categories
+INSERT INTO horse_order.categories (name, description)
+VALUES
+    ('Riding Equipment', 'Equipment used for horseback riding'),
+    ('Horse Care', 'Products for horse health and grooming'),
+    ('Show Horses', 'Horses trained for showing');
+
+-- Insert test horses
+INSERT INTO horse_order.horses (horse_id, name, breed, age, color, gender, price, details)
+VALUES
+    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Thunder', 'Arabian', 5, 'Bay', 'Male', 15000.00, '{"training": "Advanced", "lineage": "Champion sire"}'),
+    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Storm', 'Thoroughbred', 3, 'Black', 'Female', 12000.00, '{"training": "Intermediate", "temperament": "Gentle"}');
+
+-- Insert test products
+INSERT INTO horse_order.products (product_id, category_id, name, description, price, stock_quantity)
+VALUES
+    ('cccccccc-cccc-cccc-cccc-cccccccccccc', 
+     (SELECT category_id FROM horse_order.categories WHERE name = 'Riding Equipment'),
+     'Premium Saddle', 'High-quality leather saddle', 899.99, 10),
+    ('dddddddd-dddd-dddd-dddd-dddddddddddd', 
+     (SELECT category_id FROM horse_order.categories WHERE name = 'Horse Care'),
+     'Horse Shampoo', 'Gentle cleansing shampoo', 24.99, 50);
+
+-- Insert test orders
+INSERT INTO horse_order.orders (order_id, user_id, status, shipping_info, payment_info, total_amount)
+VALUES
+    ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', '11111111-1111-1111-1111-111111111111', 'pending', 
+    '{"address": "123 Test St", "city": "Testville", "zip": "12345"}',
+    '{"method": "credit_card", "last4": "1234"}',
+    899.99);
+
+-- Insert test order items
+INSERT INTO horse_order.order_items (order_id, product_id, quantity, unit_price)
+VALUES
+    ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 1, 899.99);
