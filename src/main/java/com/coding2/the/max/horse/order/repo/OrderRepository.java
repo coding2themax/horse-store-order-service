@@ -1,20 +1,29 @@
 package com.coding2.the.max.horse.order.repo;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.stereotype.Repository;
 
 import com.coding2.the.max.horse.order.model.HorseStoreOrder;
 import com.coding2.the.max.horse.order.model.OrderStatus;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 /**
  * Repository interface for pet orders
  */
-public interface OrderRepository {
-  void save(HorseStoreOrder order);
+@Repository
+public interface OrderRepository extends ReactiveCrudRepository<HorseStoreOrder, UUID> {
 
-  Optional<HorseStoreOrder> findById(String orderId);
+  @Query("SELECT * FROM orders WHERE user_id = :userId")
+  Flux<HorseStoreOrder> findByUserId(UUID userId);
 
-  List<HorseStoreOrder> findByCustomerId(String customerId);
+  @Query("SELECT * FROM orders WHERE status = :status")
+  Flux<HorseStoreOrder> findByStatus(OrderStatus status);
 
-  List<HorseStoreOrder> findByStatus(OrderStatus status);
+  @Query("SELECT * FROM orders WHERE order_id = :orderId")
+  Mono<HorseStoreOrder> findByOrderId(UUID orderId);
 }
