@@ -1,27 +1,26 @@
-package com.coding2.the.max.horse.order.model;
+package com.coding2.the.max.horse.order.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
+import com.coding2.the.max.horse.order.model.OrderStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Represents a pet order in the system
  */
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("orders")
 public class HorseStoreOrder {
-  @Id
   private UUID orderId;
   private UUID userId;
   private LocalDateTime orderDate;

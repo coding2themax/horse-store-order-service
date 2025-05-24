@@ -35,7 +35,7 @@ public class OrderHandler {
     String orderId = request.pathVariable("orderId");
     return Mono.fromCallable(() -> orderService.getOrderById(orderId))
         .flatMap(order -> ServerResponse.ok().bodyValue(order))
-        .onErrorResume(OrderNotFoundException.class, e -> ServerResponse.notFound().build());
+        .onErrorResume(OrderNotFoundException.class, _ -> ServerResponse.notFound().build());
   }
 
   public Mono<ServerResponse> updateOrder(ServerRequest request) {
@@ -43,7 +43,7 @@ public class OrderHandler {
     return request.bodyToMono(HorseStoreOrder.class)
         .flatMap(order -> Mono.fromCallable(() -> orderService.updateOrder(orderId, order)))
         .flatMap(order -> ServerResponse.ok().bodyValue(order))
-        .onErrorResume(OrderNotFoundException.class, e -> ServerResponse.notFound().build())
+        .onErrorResume(OrderNotFoundException.class, _ -> ServerResponse.notFound().build())
         .onErrorResume(InvalidOrderException.class, e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
   }
 
@@ -51,7 +51,7 @@ public class OrderHandler {
     String orderId = request.pathVariable("orderId");
     return Mono.fromCallable(() -> orderService.cancelOrder(orderId))
         .flatMap(success -> ServerResponse.ok().bodyValue(success))
-        .onErrorResume(OrderNotFoundException.class, e -> ServerResponse.notFound().build())
+        .onErrorResume(OrderNotFoundException.class, _ -> ServerResponse.notFound().build())
         .onErrorResume(InvalidStatusChangeException.class, e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
   }
 
@@ -60,7 +60,7 @@ public class OrderHandler {
     return request.bodyToMono(PaymentDetails.class)
         .flatMap(payment -> Mono.fromCallable(() -> orderService.processPayment(orderId, payment)))
         .flatMap(order -> ServerResponse.ok().bodyValue(order))
-        .onErrorResume(OrderNotFoundException.class, e -> ServerResponse.notFound().build())
+        .onErrorResume(OrderNotFoundException.class, _ -> ServerResponse.notFound().build())
         .onErrorResume(PaymentProcessingException.class, e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
   }
 
@@ -69,7 +69,7 @@ public class OrderHandler {
     return request.bodyToMono(OrderStatus.class)
         .flatMap(status -> Mono.fromCallable(() -> orderService.updateOrderStatus(orderId, status)))
         .flatMap(order -> ServerResponse.ok().bodyValue(order))
-        .onErrorResume(OrderNotFoundException.class, e -> ServerResponse.notFound().build())
+        .onErrorResume(OrderNotFoundException.class, _ -> ServerResponse.notFound().build())
         .onErrorResume(InvalidStatusChangeException.class, e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
   }
 
