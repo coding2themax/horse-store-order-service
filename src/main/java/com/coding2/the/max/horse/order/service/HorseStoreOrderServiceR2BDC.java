@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.coding2.the.max.horse.order.dto.HorseStoreOrder;
+import com.coding2.the.max.horse.order.dto.HorseStoreOrderDTO;
 import com.coding2.the.max.horse.order.exception.InvalidOrderException;
 import com.coding2.the.max.horse.order.exception.InvalidStatusChangeException;
 import com.coding2.the.max.horse.order.exception.OrderNotFoundException;
@@ -25,7 +25,7 @@ public class HorseStoreOrderServiceR2BDC implements HorseStoreOrderService {
   private final OrderRepository orderRepository;
 
   @Override
-  public Mono<HorseStoreOrder> createOrder(HorseStoreOrder horseOrder) {
+  public Mono<HorseStoreOrderDTO> createOrder(HorseStoreOrderDTO horseOrder) {
     return Mono.just(horseOrder).map(order -> {
       order.setOrderDate(LocalDateTime.now());
       order.setStatus(OrderStatus.PENDING);
@@ -35,13 +35,13 @@ public class HorseStoreOrderServiceR2BDC implements HorseStoreOrderService {
   }
 
   @Override
-  public Mono<HorseStoreOrder> getOrderById(String orderId) {
+  public Mono<HorseStoreOrderDTO> getOrderById(String orderId) {
     return orderRepository.findByOrderId(UUID.fromString(orderId))
         .switchIfEmpty(Mono.error(new OrderNotFoundException("Order not found with id: " + orderId)));
   }
 
   @Override
-  public Mono<HorseStoreOrder> updateOrder(String orderId, HorseStoreOrder horseOrder) {
+  public Mono<HorseStoreOrderDTO> updateOrder(String orderId, HorseStoreOrderDTO horseOrder) {
     return orderRepository.findByOrderId(UUID.fromString(orderId))
         .switchIfEmpty(Mono.error(new OrderNotFoundException("Order not found with id: " + orderId)))
         .flatMap(existingOrder -> {
@@ -74,7 +74,7 @@ public class HorseStoreOrderServiceR2BDC implements HorseStoreOrderService {
   }
 
   @Override
-  public Mono<HorseStoreOrder> processPayment(String orderId, PaymentDetails paymentDetails) {
+  public Mono<HorseStoreOrderDTO> processPayment(String orderId, PaymentDetails paymentDetails) {
     return orderRepository.findByOrderId(UUID.fromString(orderId))
         .switchIfEmpty(Mono.error(new OrderNotFoundException("Order not found with id: " + orderId))).flatMap(order -> {
           if (order.getStatus() != OrderStatus.PENDING) {
@@ -93,7 +93,7 @@ public class HorseStoreOrderServiceR2BDC implements HorseStoreOrderService {
   }
 
   @Override
-  public Mono<HorseStoreOrder> updateOrderStatus(String orderId, OrderStatus status) {
+  public Mono<HorseStoreOrderDTO> updateOrderStatus(String orderId, OrderStatus status) {
     return orderRepository.findByOrderId(UUID.fromString(orderId))
         .switchIfEmpty(Mono.error(new OrderNotFoundException("Order not found with id: " + orderId))).flatMap(order -> {
           if (!isValidStatusTransition(order.getStatus(), status)) {
@@ -111,12 +111,12 @@ public class HorseStoreOrderServiceR2BDC implements HorseStoreOrderService {
   }
 
   @Override
-  public Flux<HorseStoreOrder> findOrdersByCustomer(String customerId) {
+  public Flux<HorseStoreOrderDTO> findOrdersByCustomer(String customerId) {
     return orderRepository.findByUserId(UUID.fromString(customerId));
   }
 
   @Override
-  public Flux<HorseStoreOrder> findOrdersByStatus(OrderStatus status) {
+  public Flux<HorseStoreOrderDTO> findOrdersByStatus(OrderStatus status) {
     return orderRepository.findByStatus(status);
   }
 

@@ -20,7 +20,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class HorseStoreOrder {
+public class HorseStoreOrderDTO {
   private UUID orderId;
   private UUID userId;
   private LocalDateTime orderDate;
