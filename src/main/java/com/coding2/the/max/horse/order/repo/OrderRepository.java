@@ -6,24 +6,23 @@ import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 
-import com.coding2.the.max.horse.order.dto.HorseStoreOrderDTO;
-import com.coding2.the.max.horse.order.model.OrderStatus;
+import com.coding2.the.max.horse.order.model.Order;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * Repository interface for pet orders
+ * Repository interface for horse orders
  */
 @Repository
-public interface OrderRepository extends ReactiveCrudRepository<HorseStoreOrderDTO, UUID> {
+public interface OrderRepository extends ReactiveCrudRepository<Order, String> {
 
-  @Query("SELECT * FROM orders WHERE user_id = :userId")
-  Flux<HorseStoreOrderDTO> findByUserId(UUID userId);
+  @Query("SELECT * FROM horse_order.orders WHERE user_id = :userId")
+  Flux<Order> findByUserId(UUID userId);
 
-  @Query("SELECT * FROM orders WHERE status = :status")
-  Flux<HorseStoreOrderDTO> findByStatus(OrderStatus status);
+  @Query("SELECT * FROM horse_order.orders WHERE status = :status")
+  Flux<Order> findByStatus(String status);
 
-  @Query("SELECT * FROM orders WHERE order_id = :orderId")
-  Mono<HorseStoreOrderDTO> findByOrderId(UUID orderId);
+  @Query("SELECT * FROM horse_order.orders WHERE id = :orderId")
+  Mono<Order> findByOrderId(String orderId);
 }

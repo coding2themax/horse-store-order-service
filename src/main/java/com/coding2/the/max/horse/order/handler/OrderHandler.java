@@ -4,11 +4,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
-import com.coding2.the.max.horse.order.dto.HorseStoreOrderDTO;
 import com.coding2.the.max.horse.order.exception.InvalidOrderException;
 import com.coding2.the.max.horse.order.exception.InvalidStatusChangeException;
 import com.coding2.the.max.horse.order.exception.OrderNotFoundException;
 import com.coding2.the.max.horse.order.exception.PaymentProcessingException;
+import com.coding2.the.max.horse.order.model.Order;
 import com.coding2.the.max.horse.order.model.OrderStatus;
 import com.coding2.the.max.horse.order.model.PaymentDetails;
 import com.coding2.the.max.horse.order.service.HorseStoreOrderService;
@@ -25,8 +25,7 @@ public class OrderHandler {
   }
 
   public Mono<ServerResponse> createOrder(ServerRequest request) {
-    return request.bodyToMono(HorseStoreOrderDTO.class)
-        .flatMap(order -> Mono.fromCallable(() -> orderService.createOrder(order)))
+    return request.bodyToMono(Order.class).flatMap(order -> Mono.fromCallable(() -> orderService.createOrder(order)))
         .flatMap(order -> ServerResponse.ok().bodyValue(order))
         .onErrorResume(InvalidOrderException.class, e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
   }
@@ -40,7 +39,7 @@ public class OrderHandler {
 
   public Mono<ServerResponse> updateOrder(ServerRequest request) {
     String orderId = request.pathVariable("orderId");
-    return request.bodyToMono(HorseStoreOrderDTO.class)
+    return request.bodyToMono(Order.class)
         .flatMap(order -> Mono.fromCallable(() -> orderService.updateOrder(orderId, order)))
         .flatMap(order -> ServerResponse.ok().bodyValue(order))
         .onErrorResume(OrderNotFoundException.class, _ -> ServerResponse.notFound().build())

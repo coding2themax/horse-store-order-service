@@ -1,10 +1,10 @@
 package com.coding2.the.max.horse.order.service;
 
-import com.coding2.the.max.horse.order.dto.HorseStoreOrderDTO;
 import com.coding2.the.max.horse.order.exception.InvalidOrderException;
 import com.coding2.the.max.horse.order.exception.InvalidStatusChangeException;
 import com.coding2.the.max.horse.order.exception.OrderNotFoundException;
 import com.coding2.the.max.horse.order.exception.PaymentProcessingException;
+import com.coding2.the.max.horse.order.model.Order;
 import com.coding2.the.max.horse.order.model.OrderStatus;
 import com.coding2.the.max.horse.order.model.PaymentDetails;
 
@@ -24,7 +24,7 @@ public interface HorseStoreOrderService {
      * @return Mono containing the created horse order with generated ID and status
      * @throws InvalidOrderException If the order data is invalid
      */
-    Mono<HorseStoreOrderDTO> createOrder(HorseStoreOrderDTO horseOrder);
+    Mono<Order> createOrder(Order horseOrder);
 
     /**
      * Retrieve an existing horse order by its unique identifier
@@ -33,7 +33,7 @@ public interface HorseStoreOrderService {
      * @return Mono containing the horse order if found
      * @throws OrderNotFoundException If no order exists with the given ID
      */
-    Mono<HorseStoreOrderDTO> getOrderById(String orderId);
+    Mono<Order> getOrderById(String orderId);
 
     /**
      * Update an existing horse order
@@ -44,7 +44,7 @@ public interface HorseStoreOrderService {
      * @throws OrderNotFoundException If no order exists with the given ID
      * @throws InvalidOrderException  If the updated order data is invalid
      */
-    Mono<HorseStoreOrderDTO> updateOrder(String orderId, HorseStoreOrderDTO horseOrder);
+    Mono<Order> updateOrder(String orderId, Order horseOrder);
 
     /**
      * Cancel an existing horse order
@@ -66,7 +66,7 @@ public interface HorseStoreOrderService {
      * @throws OrderNotFoundException     If no order exists with the given ID
      * @throws PaymentProcessingException If payment processing fails
      */
-    Mono<HorseStoreOrderDTO> processPayment(String orderId, PaymentDetails paymentDetails);
+    Mono<Order> processPayment(String orderId, PaymentDetails paymentDetails);
 
     /**
      * Update the status of an order
@@ -77,7 +77,7 @@ public interface HorseStoreOrderService {
      * @throws OrderNotFoundException       If no order exists with the given ID
      * @throws InvalidStatusChangeException If the status change is not allowed
      */
-    Mono<HorseStoreOrderDTO> updateOrderStatus(String orderId, OrderStatus status);
+    Mono<Order> updateOrderStatus(String orderId, OrderStatus status);
 
     /**
      * Find orders by customer ID
@@ -85,7 +85,7 @@ public interface HorseStoreOrderService {
      * @param customerId The ID of the customer
      * @return Flux of orders for the specified customer
      */
-    Flux<HorseStoreOrderDTO> findOrdersByCustomer(String customerId);
+    Flux<Order> findOrdersByCustomer(String customerId);
 
     /**
      * Find orders by status
@@ -93,5 +93,5 @@ public interface HorseStoreOrderService {
      * @param status The order status to search for
      * @return Flux of orders with the specified status
      */
-    Flux<HorseStoreOrderDTO> findOrdersByStatus(OrderStatus status);
+    Flux<Order> findOrdersByStatus(OrderStatus status);
 }
