@@ -4,11 +4,13 @@ import java.math.BigDecimal;
 
 import org.springframework.data.relational.core.mapping.Table;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "orders", schema = "horse_order")
 public class Order {
   private String id;
