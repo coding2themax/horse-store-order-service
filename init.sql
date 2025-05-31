@@ -1,8 +1,3 @@
--- Create the database
-CREATE DATABASE "horse-order-service";
-
--- Connect to the database
-\c "horse-order-service"
 
 -- Create the database schema for Horse Store
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
