@@ -1,6 +1,5 @@
 package com.coding2.the.max.horse.order.service;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -27,7 +26,6 @@ public class HorseStoreOrderServiceR2BDC implements HorseStoreOrderService {
   @Override
   public Mono<Order> createOrder(Order horseOrder) {
     return Mono.just(horseOrder).map(order -> {
-      order.setShipDate(LocalDateTime.now().toString());
       order.setStatus(OrderStatus.PENDING.toString());
       return order;
     }).flatMap(orderRepository::save)
@@ -45,7 +43,7 @@ public class HorseStoreOrderServiceR2BDC implements HorseStoreOrderService {
     return orderRepository.findByOrderId(orderId)
         .switchIfEmpty(Mono.error(new OrderNotFoundException("Order not found with id: " + orderId)))
         .flatMap(existingOrder -> {
-          horseOrder.setId(existingOrder.getId());
+          horseOrder.setOrderId(existingOrder.getOrderId());
           return orderRepository.save(horseOrder);
         }).onErrorMap(e -> {
           if (e instanceof OrderNotFoundException) {

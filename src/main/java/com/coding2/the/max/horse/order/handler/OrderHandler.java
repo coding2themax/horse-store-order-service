@@ -1,5 +1,6 @@
 package com.coding2.the.max.horse.order.handler;
 
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -25,15 +26,14 @@ public class OrderHandler {
   }
 
   public Mono<ServerResponse> createOrder(ServerRequest request) {
-    return request.bodyToMono(Order.class).flatMap(order -> Mono.fromCallable(() -> orderService.createOrder(order)))
-        .flatMap(order -> ServerResponse.ok().bodyValue(order))
+    return request.bodyToMono(Order.class).flatMap(order -> orderService.createOrder(order))
+        .flatMap(order -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(order))
         .onErrorResume(InvalidOrderException.class, e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
   }
 
   public Mono<ServerResponse> getOrderById(ServerRequest request) {
     String orderId = request.pathVariable("orderId");
-    return Mono.fromCallable(() -> orderService.getOrderById(orderId))
-        .flatMap(order -> ServerResponse.ok().bodyValue(order))
+    return orderService.getOrderById(orderId).flatMap(order -> ServerResponse.ok().bodyValue(order))
         .onErrorResume(OrderNotFoundException.class, _ -> ServerResponse.notFound().build());
   }
 

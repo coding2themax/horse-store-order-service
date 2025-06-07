@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
  * Repository interface for horse orders
  */
 @Repository
-public interface OrderRepository extends ReactiveCrudRepository<Order, String> {
+public interface OrderRepository extends ReactiveCrudRepository<Order, UUID> {
 
   @Query("SELECT * FROM horse_order.orders WHERE user_id = :userId")
   Flux<Order> findByUserId(UUID userId);

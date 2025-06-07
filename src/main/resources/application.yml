@@ -1,10 +1,10 @@
 spring:
   application:
-    name: petstore-order-service
+    name: horse-store-order-service
   r2dbc:
-    url: ${DATABASE_HOST:localhost}
-    username: ${DATABASE_USERNAME:postgres}
-    password: ${DATABASE_PASSWORD:postgres}
+    url: r2dbc:postgresql://localhost:5432/horse-order-service
+    username: postgres
+    password: example
     pool:
       initial-size: 5
       max-size: 20
