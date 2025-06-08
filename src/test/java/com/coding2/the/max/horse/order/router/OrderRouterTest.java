@@ -33,38 +33,43 @@ public class OrderRouterTest {
 
   @Test
   public void testCreateOrder() {
+    // Use a valid UUID format
+    UUID validId = UUID.randomUUID();
     Order order = new Order();
-    order.setOrderId(UUID.fromString("123"));
+    order.setOrderId(validId);
     order.setStatus(OrderStatus.PENDING.toString());
 
     when(orderHandler.createOrder(any())).thenReturn(ServerResponse.ok().bodyValue(order));
 
     webTestClient.post().uri("/api/orders").contentType(MediaType.APPLICATION_JSON).bodyValue(order).exchange()
-        .expectStatus().isOk().expectBody().jsonPath("$.id").isEqualTo("123").jsonPath("$.status").isEqualTo("PENDING");
+        .expectStatus().isOk().expectBody().jsonPath("$.orderId").isEqualTo(validId.toString()).jsonPath("$.status")
+        .isEqualTo("PENDING");
   }
 
   @Test
   public void testGetOrderById() {
+    UUID validId = UUID.randomUUID();
     Order order = new Order();
-    order.setOrderId(UUID.fromString("123"));
+    order.setOrderId(validId);
     order.setStatus(OrderStatus.PENDING.toString());
 
     when(orderHandler.getOrderById(any())).thenReturn(ServerResponse.ok().bodyValue(order));
 
-    webTestClient.get().uri("/api/orders/123").exchange().expectStatus().isOk().expectBody().jsonPath("$.id")
-        .isEqualTo("123").jsonPath("$.status").isEqualTo("PENDING");
+    webTestClient.get().uri("/api/orders/123").exchange().expectStatus().isOk().expectBody().jsonPath("$.orderId")
+        .isEqualTo(validId.toString()).jsonPath("$.status").isEqualTo("PENDING");
   }
 
   @Test
   public void testUpdateOrder() {
+    UUID validId = UUID.randomUUID();
     Order order = new Order();
-    order.setOrderId(UUID.fromString("123"));
+    order.setOrderId(validId);
     order.setStatus(OrderStatus.PROCESSING.toString());
 
     when(orderHandler.updateOrder(any())).thenReturn(ServerResponse.ok().bodyValue(order));
 
     webTestClient.put().uri("/api/orders/123").contentType(MediaType.APPLICATION_JSON).bodyValue(order).exchange()
-        .expectStatus().isOk().expectBody().jsonPath("$.id").isEqualTo("123").jsonPath("$.status")
+        .expectStatus().isOk().expectBody().jsonPath("$.orderId").isEqualTo(validId.toString()).jsonPath("$.status")
         .isEqualTo("PROCESSING");
   }
 
@@ -79,7 +84,9 @@ public class OrderRouterTest {
   @Test
   public void testProcessPayment() {
     Order order = new Order();
-    order.setOrderId(UUID.fromString("123"));
+    UUID validId = UUID.randomUUID();
+
+    order.setOrderId(validId);
     order.setStatus(OrderStatus.PROCESSING.toString());
     PaymentDetails paymentDetails = PaymentDetails.builder().paymentMethodId("123").transactionId("1234567890")
         .amount(100.0).currency("USD").build();
@@ -87,8 +94,8 @@ public class OrderRouterTest {
     when(orderHandler.processPayment(any())).thenReturn(ServerResponse.ok().bodyValue(order));
 
     webTestClient.post().uri("/api/orders/123/payment").contentType(MediaType.APPLICATION_JSON)
-        .bodyValue(paymentDetails).exchange().expectStatus().isOk().expectBody().jsonPath("$.id").isEqualTo("123")
-        .jsonPath("$.status").isEqualTo("PROCESSING");
+        .bodyValue(paymentDetails).exchange().expectStatus().isOk().expectBody().jsonPath("$.orderId")
+        .isEqualTo(validId.toString()).jsonPath("$.status").isEqualTo("PROCESSING");
   }
 
   @Test
@@ -101,7 +108,7 @@ public class OrderRouterTest {
     when(orderHandler.updateOrderStatus(any())).thenReturn(ServerResponse.ok().bodyValue(order));
 
     webTestClient.patch().uri("/api/orders/123/status").contentType(MediaType.APPLICATION_JSON)
-        .bodyValue(OrderStatus.PROCESSING).exchange().expectStatus().isOk().expectBody().jsonPath("$.id")
+        .bodyValue(OrderStatus.PROCESSING).exchange().expectStatus().isOk().expectBody().jsonPath("$.orderId")
         .isEqualTo(orderId.toString()).jsonPath("$.status").isEqualTo("PROCESSING");
   }
 
