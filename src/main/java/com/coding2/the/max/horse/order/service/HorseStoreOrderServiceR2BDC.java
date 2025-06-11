@@ -34,13 +34,13 @@ public class HorseStoreOrderServiceR2BDC implements HorseStoreOrderService {
 
   @Override
   public Mono<Order> getOrderById(String orderId) {
-    return orderRepository.findByOrderId(orderId)
+    return orderRepository.findByOrderId(UUID.fromString(orderId))
         .switchIfEmpty(Mono.error(new OrderNotFoundException("Order not found with id: " + orderId)));
   }
 
   @Override
   public Mono<Order> updateOrder(String orderId, Order horseOrder) {
-    return orderRepository.findByOrderId(orderId)
+    return orderRepository.findByOrderId(UUID.fromString(orderId))
         .switchIfEmpty(Mono.error(new OrderNotFoundException("Order not found with id: " + orderId)))
         .flatMap(existingOrder -> {
           horseOrder.setOrderId(existingOrder.getOrderId());
@@ -55,7 +55,7 @@ public class HorseStoreOrderServiceR2BDC implements HorseStoreOrderService {
 
   @Override
   public Mono<Boolean> cancelOrder(String orderId) {
-    return orderRepository.findByOrderId(orderId)
+    return orderRepository.findByOrderId(UUID.fromString(orderId))
         .switchIfEmpty(Mono.error(new OrderNotFoundException("Order not found with id: " + orderId))).flatMap(order -> {
           if (order.getStatus().equals(OrderStatus.COMPLETED.toString())) {
             return Mono.error(new InvalidStatusChangeException("Cannot cancel a completed order"));
@@ -72,7 +72,7 @@ public class HorseStoreOrderServiceR2BDC implements HorseStoreOrderService {
 
   @Override
   public Mono<Order> processPayment(String orderId, PaymentDetails paymentDetails) {
-    return orderRepository.findByOrderId(orderId)
+    return orderRepository.findByOrderId(UUID.fromString(orderId))
         .switchIfEmpty(Mono.error(new OrderNotFoundException("Order not found with id: " + orderId))).flatMap(order -> {
           if (!order.getStatus().equals(OrderStatus.PENDING.toString())) {
             return Mono.error(new InvalidStatusChangeException("Can only process payment for pending orders"));
@@ -89,7 +89,7 @@ public class HorseStoreOrderServiceR2BDC implements HorseStoreOrderService {
 
   @Override
   public Mono<Order> updateOrderStatus(String orderId, OrderStatus status) {
-    return orderRepository.findByOrderId(orderId)
+    return orderRepository.findByOrderId(UUID.fromString(orderId))
         .switchIfEmpty(Mono.error(new OrderNotFoundException("Order not found with id: " + orderId))).flatMap(order -> {
           if (!isValidStatusTransition(OrderStatus.valueOf(order.getStatus()), status)) {
             return Mono.error(new InvalidStatusChangeException(

@@ -9,14 +9,16 @@ import org.springframework.data.convert.ReadingConverter;
 import org.springframework.stereotype.Component;
 
 import com.coding2.the.max.horse.order.model.Order;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.r2dbc.postgresql.codec.Json;
 import io.r2dbc.spi.Row;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @ReadingConverter
+@Slf4j
 public class OrderReadConverter implements Converter<Row, Order> {
 
   private final ObjectMapper objectMapper;
@@ -27,30 +29,63 @@ public class OrderReadConverter implements Converter<Row, Order> {
 
   @Override
   public Order convert(Row row) {
-    UUID orderId = row.get("order_id", UUID.class);
-    UUID userId = row.get("user_id", UUID.class);
-    LocalDateTime orderDate = row.get("order_date", LocalDateTime.class);
-    String status = row.get("status", String.class);
-    BigDecimal totalAmount = row.get("total_amount", BigDecimal.class);
-
-    // Convert shipping_info from database format to JsonNode
-    JsonNode shippingInfo;
     try {
-      String shippingInfoJson = row.get("shipping_info", String.class);
-      shippingInfo = objectMapper.readTree(shippingInfoJson);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException("Failed to parse shipping_info JSON", e);
-    }
+      UUID orderId = row.get("order_id", UUID.class);
+      UUID userId = row.get("user_id", UUID.class);
+      LocalDateTime orderDate = row.get("order_date", LocalDateTime.class);
+      String status = row.get("status", String.class);
+      BigDecimal totalAmount = row.get("total_amount", BigDecimal.class);
 
-    // Convert payment_info from database format to JsonNode
-    JsonNode paymentInfo;
+      // Handle shipping_info JSON
+      Object shippingInfoObj = row.get("shipping_info");
+      JsonNode shippingInfo = convertToJsonNode(shippingInfoObj, "shipping_info");
+
+      // Handle payment_info JSON
+      Object paymentInfoObj = row.get("payment_info");
+      JsonNode paymentInfo = convertToJsonNode(paymentInfoObj, "payment_info");
+
+      return new Order(orderId, userId, orderDate, status, shippingInfo, paymentInfo, totalAmount);
+    } catch (Exception e) {
+      log.error("Error converting database row to Order", e);
+      throw new RuntimeException("Error converting database row to Order: " + e.getMessage(), e);
+    }
+  }
+
+  private JsonNode convertToJsonNode(Object jsonObj, String fieldName) {
     try {
-      String paymentInfoJson = row.get("payment_info", String.class);
-      paymentInfo = objectMapper.readTree(paymentInfoJson);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException("Failed to parse payment_info JSON", e);
-    }
+      if (jsonObj == null) {
+        log.debug("{} is null, returning empty object", fieldName);
+        return objectMapper.createObjectNode();
+      }
 
-    return new Order(orderId, userId, orderDate, status, shippingInfo, paymentInfo, totalAmount);
+      log.debug("{} object type: {}", fieldName, jsonObj.getClass().getName());
+
+      if (jsonObj instanceof Json) {
+        // Handle PostgreSQL specific JSON type
+        String content = ((Json) jsonObj).asString();
+        log.debug("{} content from Json: {}", fieldName, content);
+        return objectMapper.readTree(content);
+      } else if (jsonObj instanceof String) {
+        log.debug("{} content from String: {}", fieldName, jsonObj);
+        return objectMapper.readTree((String) jsonObj);
+      } else if (jsonObj instanceof byte[]) {
+        byte[] bytes = (byte[]) jsonObj;
+        log.debug("{} content from byte array, length: {}", fieldName, bytes.length);
+        return objectMapper.readTree(bytes);
+      } else if (jsonObj instanceof JsonNode) {
+        return (JsonNode) jsonObj;
+      } else if (jsonObj instanceof io.r2dbc.postgresql.codec.Json) {
+        // Handle PostgreSQL specific JSON type
+        return objectMapper.readTree(((io.r2dbc.postgresql.codec.Json) jsonObj).asString());
+      } else {
+        // As a fallback, try to convert the object using toString()
+        log.warn("{} using fallback conversion for type: {}", fieldName, jsonObj.getClass().getName());
+        return objectMapper.readTree(jsonObj.toString());
+      }
+    } catch (Exception e) {
+      log.error("Error converting {} to JsonNode: {}", fieldName, e.getMessage());
+      // Return empty object node instead of throwing exception
+      return objectMapper.createObjectNode();
+    }
   }
 }
