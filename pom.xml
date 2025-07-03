@@ -178,6 +178,70 @@
 				</executions>
 			</plugin>
 
+			<!-- SpotBugs Plugin for static analysis -->
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>4.8.6.4</version>
+				<configuration>
+					<effort>Max</effort>
+					<threshold>Medium</threshold>
+					<xmlOutput>true</xmlOutput>
+					<excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
+					<failOnError>false</failOnError>
+				</configuration>
+			</plugin>
+
+			<!-- Checkstyle Plugin for code style -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>3.6.0</version>
+				<configuration>
+					<configLocation>checkstyle.xml</configLocation>
+					<encoding>UTF-8</encoding>
+					<consoleOutput>true</consoleOutput>
+					<failsOnError>false</failsOnError>
+					<linkXRef>false</linkXRef>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>com.puppycrawl.tools</groupId>
+						<artifactId>checkstyle</artifactId>
+						<version>10.21.0</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+
+			<!-- PMD Plugin for static analysis -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<version>3.25.0</version>
+				<configuration>
+					<targetJdk>${java.version}</targetJdk>
+					<rulesets>
+						<ruleset>/category/java/bestpractices.xml</ruleset>
+						<ruleset>/category/java/errorprone.xml</ruleset>
+						<ruleset>/category/java/security.xml</ruleset>
+					</rulesets>
+					<printFailingErrors>true</printFailingErrors>
+					<failOnViolation>false</failOnViolation>
+				</configuration>
+			</plugin>
+
+			<!-- OWASP Dependency Check Plugin -->
+			<plugin>
+				<groupId>org.owasp</groupId>
+				<artifactId>dependency-check-maven</artifactId>
+				<version>11.1.0</version>
+				<configuration>
+					<format>HTML</format>
+					<failBuildOnCVSS>7</failBuildOnCVSS>
+					<suppressionFile>dependency-check-suppressions.xml</suppressionFile>
+				</configuration>
+			</plugin>
+
 			<!-- 
 			<plugin>
 				<groupId>org.openapitools</groupId>
