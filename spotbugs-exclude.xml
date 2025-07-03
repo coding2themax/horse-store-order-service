@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter>
-    <!-- Exclude test classes from SpotBugs analysis -->
-    <Match>
-        <Class name="~.*Test.*"/>
-    </Match>
-    
-    <!-- Exclude main application class -->
-    <Match>
-        <Class name="~.*Application"/>
-    </Match>
-    
-    <!-- Exclude generated code -->
-    <Match>
-        <Package name="~.*\.generated\..*"/>
-    </Match>
-    
-    <!-- Example: Exclude specific bug patterns if needed -->
-    <!-- 
+  <!-- Exclude test classes from SpotBugs analysis -->
+  <Match>
+    <Class name="~.*Test.*" />
+  </Match>
+
+  <!-- Exclude main application class -->
+  <Match>
+    <Class name="~.*Application" />
+  </Match>
+
+  <!-- Exclude generated code -->
+  <Match>
+    <Package name="~.*\.generated\..*" />
+  </Match>
+
+  <!-- Example: Exclude specific bug patterns if needed -->
+  <!-- 
     <Match>
         <Bug pattern="DM_EXIT"/>
     </Match>
