@@ -37,6 +37,11 @@ public class OrderHandler {
         .onErrorResume(OrderNotFoundException.class, _ -> ServerResponse.notFound().build());
   }
 
+  public Mono<ServerResponse> getAllOrders(ServerRequest request) {
+    return orderService.getAllOrders().collectList()
+        .flatMap(orders -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(orders));
+  }
+
   public Mono<ServerResponse> updateOrder(ServerRequest request) {
     String orderId = request.pathVariable("orderId");
     return request.bodyToMono(Order.class)

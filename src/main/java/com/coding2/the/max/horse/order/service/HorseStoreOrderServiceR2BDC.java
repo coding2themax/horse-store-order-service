@@ -133,4 +133,10 @@ public class HorseStoreOrderServiceR2BDC implements HorseStoreOrderService {
       return false;
     }
   }
+
+  @Override
+  public Flux<Order> getAllOrders() {
+    return orderRepository.getAllOrFluxders()
+        .switchIfEmpty(Flux.error(new OrderNotFoundException("No orders found in the system.")));
+  }
 }

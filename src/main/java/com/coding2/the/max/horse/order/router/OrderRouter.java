@@ -34,6 +34,7 @@ public class OrderRouter {
 
         // Order search operations
         .GET(BASE_PATH + CUSTOMER_PATH, orderHandler::findOrdersByCustomer)
+        .GET(BASE_PATH + "/all", orderHandler::getAllOrders)
         .GET(BASE_PATH + STATUS_PATH, orderHandler::findOrdersByStatus).build();
   }
 }

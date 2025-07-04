@@ -25,4 +25,7 @@ public interface OrderRepository extends ReactiveCrudRepository<Order, UUID> {
 
   @Query("SELECT * FROM horse_order.orders WHERE order_id = :orderId")
   Mono<Order> findByOrderId(UUID orderId);
+
+  @Query("SELECT * FROM horse_order.orders")
+  Flux<Order> getAllOrFluxders();
 }

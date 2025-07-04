@@ -94,4 +94,11 @@ public interface HorseStoreOrderService {
      * @return Flux of orders with the specified status
      */
     Flux<Order> findOrdersByStatus(OrderStatus status);
+
+    /**
+     * Retrieve all orders in the system
+     * 
+     * @return Flux of all horse orders
+     */
+    Flux<Order> getAllOrders();
 }
