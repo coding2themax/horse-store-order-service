@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### local data config ###
+/data
+.env
+.DS_Store

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+  <!-- Example suppression for false positives -->
+  <!--
+    <suppress>
+        <notes><![CDATA[
+        Example suppression for a specific CVE that doesn't apply to your use case
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework/.*$</packageUrl>
+        <cve>CVE-2023-XXXXX</cve>
+    </suppress>
+    -->
+</suppressions>

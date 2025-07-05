@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: horse-store-order-service
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/horse-order-service
+    username: postgres
+    password: example
+    pool:
+      initial-size: 5
+      max-size: 20
+  sql:
+    init:
+      mode: always
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    "[org.springframework.r2dbc]": DEBUG
+    "[io.r2dbc.postgresql]": DEBUG
