@@ -1,6 +1,6 @@
 # Use a multi-stage build
 # Stage 1: Build the application
-FROM openjdk:24-jdk-slim AS builder
+FROM eclipse-temurin:24-jdk-alpine AS builder
 
 # Set the working directory
 WORKDIR /app
@@ -19,13 +19,13 @@ RUN chmod +x mvnw
 RUN ./mvnw clean package -DskipTests
 
 # Stage 2: Create the runtime image
-FROM openjdk:24-jre-slim
+FROM eclipse-temurin:24-jre-alpine
 
 # Set the working directory
 WORKDIR /app
 
 # Create a non-root user
-RUN groupadd -r appuser && useradd -r -g appuser appuser
+RUN addgroup -g 1001 appuser && adduser -D -u 1001 -G appuser appuser
 
 # Copy the JAR file from the builder stage
 COPY --from=builder /app/target/*.jar app.jar
@@ -42,9 +42,9 @@ EXPOSE 13000
 # Set environment variables
 ENV JAVA_OPTS=""
 
-# Health check
+# Health check using wget (available in alpine)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:13000/actuator/health || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:13000/actuator/health || exit 1
 
 # Run the application
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
