@@ -14,9 +14,11 @@ import com.coding2.the.max.horse.order.model.OrderStatus;
 import com.coding2.the.max.horse.order.model.PaymentDetails;
 import com.coding2.the.max.horse.order.service.HorseStoreOrderService;
 
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 @Component
+@Slf4j
 public class OrderHandler {
 
   private final HorseStoreOrderService orderService;
@@ -26,6 +28,7 @@ public class OrderHandler {
   }
 
   public Mono<ServerResponse> createOrder(ServerRequest request) {
+    log.info("Creating new order");
     return request.bodyToMono(Order.class).flatMap(order -> orderService.createOrder(order))
         .flatMap(order -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(order))
         .onErrorResume(InvalidOrderException.class, e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
