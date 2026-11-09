@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: temurin
+          cache: maven
+
+      # Runs the tests (FeedPurchaseStoreTest starts Postgres in Docker),
+      # then fails if any package is below 90% coverage
+      - name: Build, test and check coverage
+        run: mvn -B verify
+
+      - name: Add coverage to job summary
+        if: always() && hashFiles('target/site/jacoco/jacoco.csv') != ''
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import csv
+          totals = {}
+          for row in csv.DictReader(open("target/site/jacoco/jacoco.csv")):
+              t = totals.setdefault(row["PACKAGE"], [0, 0])
+              t[0] += int(row["INSTRUCTION_MISSED"])
+              t[1] += int(row["INSTRUCTION_COVERED"])
+          print("### Coverage (instructions, minimum 90% per package)\n")
+          print("| Package | Coverage |\n| --- | --- |")
+          for name, (missed, covered) in sorted(totals.items()):
+              print(f"| `{name}` | {covered / (missed + covered):.1%} |")
+          PY
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: target/surefire-reports/
+          if-no-files-found: ignore
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: target/site/jacoco/
+          if-no-files-found: ignore

@@ -27,10 +27,19 @@ cd horse-store-order-service
 
 3. Install dependencies:
 
-````bash
 ```bash
 mvn install
-````
+```
+
+4. Run the tests:
+
+```bash
+mvn verify
+```
+
+   This fails if any package is below 90% code coverage. `FeedPurchaseStoreTest`
+   starts Postgres with Testcontainers, so Docker must be running. CI runs the
+   same command on every pull request.
 
 ## Usage
 
