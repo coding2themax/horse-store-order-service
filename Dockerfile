@@ -1,6 +1,6 @@
 # Use a multi-stage build
 # Stage 1: Build the application
-FROM eclipse-temurin:24-jdk-alpine AS builder
+FROM eclipse-temurin:25-jdk-alpine AS builder
 
 # Set the working directory
 WORKDIR /app
@@ -19,7 +19,7 @@ RUN chmod +x mvnw
 RUN ./mvnw clean package -DskipTests
 
 # Stage 2: Create the runtime image
-FROM eclipse-temurin:24-jre-alpine
+FROM eclipse-temurin:25-jre-alpine
 
 # Set the working directory
 WORKDIR /app
